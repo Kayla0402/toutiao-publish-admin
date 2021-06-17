@@ -9,66 +9,88 @@
         <el-input v-model="user.code" placeholder="请输入验证码"></el-input>
       </el-form-item>
       <el-form-item prop="agree">
-         <el-checkbox v-model="user.agree">我已阅读并同意用户协议</el-checkbox>
+        <el-checkbox v-model="user.agree">我已阅读并同意用户协议</el-checkbox>
       </el-form-item>
       <el-form-item>
-        <el-button class="login-btn" type="primary" @click="onLogin" :loading="isloading">登录</el-button>
+        <el-button
+          class="login-btn"
+          type="primary"
+          @click="onLogin"
+          :loading="isloading"
+          >登录</el-button
+        >
       </el-form-item>
     </el-form>
   </div>
 </template>
 
 <script>
-import { login } from "@/api/user"
+import { login } from "@/api/user";
 export default {
   name: "LoginIndex",
   data() {
     return {
-      user: {},
+      user: {
+        // mobile: Number(13911111111),
+        // code: Number(246810),
+        // agree: false
+      },
       rules: {
         mobile: [
           { required: true, message: "手机号不能为空", trigger: "blur" },
-          { pattern: /^1[3|5|7|8|9]\d{9}$/, message: "请输入正确的手机号码",trigger: "blur"},
+          {
+            pattern: /^1[3|5|7|8|9]\d{9}$/,
+            message: "请输入正确的手机号码",
+            trigger: "blur",
+          },
         ],
-         code: [
+        code: [
           { required: true, message: "请输入验证码", trigger: "blur" },
-          { pattern: /^\d{6}$/, message: "请输入正确的验证码",trigger: "blur"},
+          {
+            pattern: /^\d{6}$/,
+            message: "请输入正确的验证码",
+            trigger: "blur",
+          },
         ],
         agree: [
-          { validator: (rule, value, callback) => {
-            if(value) {
-              callback()
-            } else {
-            callback(new Error("请同意用户协议"))
-            }
-          }, 
-          trigger: "change" 
-          }
-        ]
+          {
+            validator: (rule, value, callback) => {
+              if (value) {
+                callback();
+              } else {
+                callback(new Error("请同意用户协议"));
+              }
+            },
+            trigger: "change",
+          },
+        ],
       },
-      isloading: false
+      isloading: false,
     };
   },
   methods: {
     login() {
-      this.isloading = !this.isloading
-     /* 获取表单数据; 表单验证; 验证通过，提交登陆; 成功，失败 */
-      login(this.user).then(res => {
-        this.$message.success('登陆成功')
-        this.isloading = ! this.isloading
-      }).catch(err => {
-        this.$message.error('登陆失败')
-        this.isloading = ! this.isloading
-      })
+      this.isloading = !this.isloading;
+      /* 获取表单数据; 表单验证; 验证通过，提交登陆; 成功，失败 */
+      login(this.user)
+        .then((res) => {
+          this.$message.success("登陆成功");
+          this.isloading = !this.isloading;
+          this.$router.push("/");
+        })
+        .catch((err) => {
+          this.$message.error("登陆失败");
+          this.isloading = !this.isloading;
+        });
     },
     onLogin() {
       this.$refs.user.validate((valid, err) => {
-        if(!valid) {
-          return
+        if (!valid) {
+          return;
         }
-          this.login()
-      })
-    }
+        this.login();
+      });
+    },
   },
 };
 </script>
