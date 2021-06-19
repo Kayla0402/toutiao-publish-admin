@@ -1,12 +1,39 @@
 // 基于axios封装的请求模块
 import axios from 'axios';
+import JSONbig from 'json-bigint'
+
+// const str = '{ "id": 12345678901234567890 }'
+// // JSONbig.stringify()
+// // JSONbig.parse()
+// let aaa =JSON.parse(str).id
+// console.log(aaa); // 12345678901234567000
+// console.log(JSONbig.parse(str));
+// console.log(JSONbig.parse(str).id.toString()); //12345678901234567890
+
 /* 
 创建一个axios实例，说白了就是复制了一个axios
 我们通过这个实例去发请求，把需要的配置配置个这个实例来发请求
 */
 const request = axios.create({
     // baseURL: 'http://ttapi.research.itcast.cn'
-    baseURL: 'http://api-toutiao-web.itheima.net'
+    baseURL: 'http://api-toutiao-web.itheima.net',
+    // 定义后端返回的原始数据的处理
+    // 参数data就是后端返回的原始数据（未经处理的JSON格式）
+    transformResponse: [function(data) {
+      
+      // axios默认在内部使用JSON.parse来转换处理原始数据。
+      // return JSON.parse(data)
+
+      // 后端返回的数据可能不是JSON格式字符串，
+      // 如果不是的话，那么JSONbig.parse调用会报错，
+      // 所以我们用try-catch捕获异常，处理异常的发生
+      try {
+        return JSONbig.parse(data)
+      } catch {
+        return data
+      }
+      // return JSONbig.parse(data)
+    }]
 })
 
 // 请求拦截器

@@ -47,7 +47,9 @@
 
         <el-form-item>
           <!-- button按钮的click事件有一个默认参数，当你没有指定参数的时候，它会默认传递一个没用的数据 -->
-          <el-button type="primary" @click="loadArticles(1)">查询</el-button>
+          <el-button :disabled="loading" type="primary" @click="loadArticles(1)"
+            >查询</el-button
+          >
         </el-form-item>
       </el-form>
     </el-card>
@@ -63,6 +65,7 @@
         stripe
         border
         style="width: 100%"
+        v-loading="loading"
       >
         <el-table-column prop="" label="封面">
           <template slot-scope="scope">
@@ -75,7 +78,12 @@
               alt=""
             /> -->
             <!-- <img v-else class="article-cover" src="./error.gif" alt="" /> -->
-            <el-image lazy style="width: 100px;height: 100px;" :src="scope.row.cover.images[0]" fit="cover">
+            <el-image
+              lazy
+              style="width: 100px; height: 100px"
+              :src="scope.row.cover.images[0]"
+              fit="cover"
+            >
               <div slot="placeholder" class="image-slote">
                 加载中<span class="dot">...</span>
               </div>
@@ -98,7 +106,7 @@
         </el-table-column>
         <el-table-column prop="pubdate" label="发布时间"> </el-table-column>
         <el-table-column label="操作">
-          <template>
+          <template slot-scope="scope">
             <el-button
               size="mini"
               type="primary"
@@ -110,6 +118,7 @@
               type="danger"
               icon="el-icon-delete"
               circle
+              @click="onDeleteArticle(scope.row.id)"
             ></el-button>
           </template>
         </el-table-column>
@@ -120,6 +129,8 @@
         :page-size="pageSize"
         :total="total"
         @current-change="onCurrentChange"
+        :disabled="loading"
+        :current-page.sync="page"
       >
       </el-pagination>
     </el-card>
@@ -127,7 +138,11 @@
 </template>
 
 <script>
-import { getArticles, getArticlesChannels } from "@/api/article";
+import {
+  getArticles,
+  getArticlesChannels,
+  deleteArticles,
+} from "@/api/article";
 export default {
   data() {
     return {
@@ -145,6 +160,9 @@ export default {
       status: null, // 查询文章的状态，不传是全部
       channelId: null, // 文章频道id
       rangeDate: null,
+      loading: true, // 表格加载中
+      // 保存的是当前页面，等于current-page，current-page添加.sync
+      page: 1
     };
   },
   methods: {
@@ -155,16 +173,18 @@ export default {
       console.log("submit!");
     },
     loadArticles(page = 1) {
+      this.loading = true;
       getArticles({
         page,
         per_page: this.pageSize,
         status: this.status,
         channel_id: this.channelId,
         begin_pubdate: this.rangeDate ? this.rangeDate[0] : null,
-        end_pubdate: this.rangeDate ? this.rangeDate[1] : null
+        end_pubdate: this.rangeDate ? this.rangeDate[1] : null,
       }).then((res) => {
         this.articles = res.data.data.results;
         this.total = res.data.data.total_count;
+        this.loading = false;
       });
     },
     loadArticlesChannels() {
@@ -177,6 +197,24 @@ export default {
     },
     handleDelete(index, row) {
       console.log(index, row);
+    },
+    onDeleteArticle(id) {
+      this.$confirm("确认删除吗？", "删除提示", {
+        confirmButtonText: "确认",
+        cancelButtonText: "取消",
+        type: "warning",
+      })
+        .then(() => {
+          deleteArticles(id.toString()).then((res) => {
+            this.loadArticles(this.page)
+          });
+        })
+        .catch(() => {
+          this.$message({
+            type: "info",
+            message: "已取消删除",
+          });
+        });
     },
   },
   created() {
