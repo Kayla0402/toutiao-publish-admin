@@ -76,6 +76,7 @@ export default {
         .then((res) => {
           this.$message.success("登陆成功");
           this.isloading = !this.isloading;
+          window.localStorage.setItem('user', JSON.stringify(res.data.data))
           this.$router.push("/");
         })
         .catch((err) => {
