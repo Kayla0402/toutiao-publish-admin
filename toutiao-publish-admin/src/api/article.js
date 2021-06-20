@@ -32,3 +32,36 @@ export const deleteArticles = target => {
     url: `/mp/v1_0/articles/${target}`,
   })
 }
+
+// 新建文章
+// 有默认值参数，且不是必传的，则必须放在最后
+export const addArticle = (data, draft = false) => {
+  return request({
+    method: 'POST',
+    url: '/mp/v1_0/articles',
+    data,
+    params: {
+      draft // 是否存为草稿
+    }
+  })
+}
+
+// 编辑文章
+export const updateArticle = (target, data, draft=false) => {
+  return request({
+    method: 'PUT',
+    url: `/mp/v1_0/articles/${target}`,
+    data,
+    params: {
+      draft // 是否存为草稿
+    }
+  })
+}
+
+// 获取指定的文章
+export const getArticle = target => {
+  return request({
+    method: 'GET',
+    url: `/mp/v1_0/articles/${target}`
+  })
+}

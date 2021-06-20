@@ -26,6 +26,11 @@ const routes = [
         path: '/article',
         name: 'Article',
         component: () => import(/* webpackChunkName: "home" */ '@/views/article'),
+      },
+      {
+        path: '/publish',
+        name: 'Publish',
+        component: () => import(/* webpackChunkName: "home" */ '@/views/publish'),
       }
     ]
   }

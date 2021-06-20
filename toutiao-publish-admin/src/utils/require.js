@@ -61,6 +61,17 @@ request.interceptors.request.use(
     }
   )
   
+// use(两个参数)
+// request.interceptors.response.use(res => {
+//   // 请求成功对响应数据做处理
+//   // 该返回的数据则是axios.then(res)中接收的数据
+//   return Promise.resolve(res)
+// }, err => {
+//   // 在请求错误时要做的事儿
+//  console.log(err);
+//   // 该返回的数据则是axios.catch(err)中接收的数据
+//   return Promise.reject(err)
+// })
 
 // 到处请求方法
 export default request;
