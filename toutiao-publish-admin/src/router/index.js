@@ -41,6 +41,11 @@ const routes = [
         path: '/comment',
         name: 'Comment',
         component: () => import(/* webpackChunkName: "home" */ '@/views/comment'),
+      },
+      {
+        path: '/settings',
+        name: 'Setting',
+        component: () => import(/* webpackChunkName: "home" */ '@/views/setting'),
       }
     ]
   }
