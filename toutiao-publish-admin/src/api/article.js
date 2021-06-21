@@ -65,3 +65,17 @@ export const getArticle = target => {
     url: `/mp/v1_0/articles/${target}`
   })
 }
+
+// 修改文章评论状态
+export const updateCommentStatus = (articleId, allow_comment) => {
+  return request({
+    method: 'PUT',
+    url: `/mp/v1_0/comments/status`,
+    params: {
+      article_id: articleId
+    },
+    data: {
+      allow_comment
+    }
+  })
+}

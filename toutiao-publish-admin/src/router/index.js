@@ -36,6 +36,11 @@ const routes = [
         path: '/image',
         name: 'Image',
         component: () => import(/* webpackChunkName: "home" */ '@/views/images'),
+      },
+      {
+        path: '/comment',
+        name: 'Comment',
+        component: () => import(/* webpackChunkName: "home" */ '@/views/comment'),
       }
     ]
   }
