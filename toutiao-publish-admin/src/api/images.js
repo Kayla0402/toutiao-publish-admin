@@ -20,3 +20,22 @@ export const getImages = params => {
     params
   })
 } 
+
+// 收藏取消收藏
+export const collectImages = (imgId, collect) => {
+  return request({
+    method: 'PUT',
+    url: `/mp/v1_0/user/images/${imgId}`,
+    data: {
+      collect
+    }
+  })
+} 
+
+// 删除图片
+export const deleteImages = imgId => {
+  return request({
+    method: 'DELETE',
+    url: `/mp/v1_0/user/images/${imgId}`,
+  })
+}

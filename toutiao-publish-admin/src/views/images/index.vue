@@ -29,18 +29,43 @@
           :lg="4"
           :sm="6"
           :xs="12"
-          class="img-item"
           v-for="image in images"
           :key="image.id"
+          class="image-item"
         >
           <el-image
             style="height: 100px"
             :src="image.url"
             fit="cover"
           ></el-image>
-          <div class="select-btn">
-            <i class="el-icon-star-on"></i>
-            <i class="el-icon-delete"></i>
+          <div class="image-action">
+            <!-- 收藏，取消收藏时，按钮图标禁止点击，
+            不用使用i标签，不好处理
+            :loading="isLoading" 这样绑定loading，
+            则每个图片对象的loading状态都是一样的
+             -->
+            <el-button
+              :icon="
+                image.is_collected ? 'el-icon-star-on' : 'el-icon-star-off'
+              "
+              circle
+              size="small"
+              @click="onCollect(image)"
+              :loading="image.loading"
+            ></el-button>
+            <!-- <i :class="{
+              'el-icon-star-on': image.is_collected,
+              'el-icon-star-off': !image.is_collected,
+              }"
+              @click="onCollect(image)"></i> -->
+            <!-- <i class="el-icon-delete" @click="onCollect(image)"></i> -->
+            <el-button
+              icon="el-icon-delete"
+              circle
+              size="small"
+              @click="onDelete(image)"
+              :loading="image.delLoading"
+            ></el-button>
           </div>
         </el-col>
       </el-row>
@@ -51,9 +76,10 @@
         :total="total"
         :current-page.sync="page"
         @current-change="currentChange"
+        :page-size="per_page"
       ></el-pagination>
     </el-card>
-    
+
     <el-dialog
       title="上传素材"
       :visible.sync="dialogVisible"
@@ -84,7 +110,7 @@
 </template>
 
 <script>
-import { getImages } from "@/api/images";
+import { getImages, collectImages, deleteImages } from "@/api/images";
 export default {
   name: "ImageTem",
   data() {
@@ -100,31 +126,60 @@ export default {
       total: 0,
       page: 1,
       per_page: 10,
+      // isLoading: true， 图片收藏的loading，这样添加每个image的loading状态都是一样的
     };
   },
   components: {},
   methods: {
-    loaderImages(collect = false) {
+    loaderImages() {
       getImages({
-        collect,
+        collect: this.collect,
         page: this.page,
         per_page: this.per_page,
       }).then((res) => {
-        this.images = res.data.data.results;
+        const results = res.data.data.results;
+        results.forEach((img) => {
+          /* img对象本来是没有loading属性的，
+          我们在这里添加loading属性是来控制每个收藏按钮的loading
+          状态，不然所有的loading都是一样的 */
+          img.loading = false;
+          img.delLoading = false;
+        });
+        this.images = results;
         this.total = res.data.data.total_count;
+        // this.isLoading = false
       });
     },
-    onCollectChange(value) {
+    onCollectChange() {
       this.page = 1;
-      this.loaderImages(value);
+      this.loaderImages();
     },
     updateSuccess() {
       this.dialogVisible = false;
-      this.loaderImages(false);
+      this.loaderImages();
     },
     currentChange(page) {
       this.page = page;
       this.loaderImages();
+    },
+    // 收藏图片
+    onCollect(img) {
+      img.loading = true;
+      // this.isLoading = true
+      collectImages(img.id, !img.is_collected).then((res) => {
+        img.is_collected = !img.is_collected;
+        // this.isLoading = false
+        img.loading = false;
+      });
+    },
+    // 删除图片
+    onDelete(img) {
+      img.delLoading = true;
+      deleteImages(img.id).then((res) => {
+        this.page = 1;
+        this.loaderImages();
+        this.delLoading = false;
+      });
     },
   },
   created() {
@@ -141,35 +196,23 @@ export default {
   margin: 0 20px 20px;
   position: relative;
 }
-.select-btn {
-  position: relative;
-  bottom: 0;
-  top: -35px;
-  // width: 180px;
-  height: 30px;
-  background: rgba(0, 0, 0, 0.1);
+
+.image-action {
   display: flex;
-  font-size: 21px;
-  justify-content: space-around;
   align-items: center;
+  justify-content: space-evenly;
+  color: #fff;
+  height: 40px;
+  background-color: rgba(204, 204, 204, 0.5);
+  position: absolute;
+  bottom: 4px;
+  left: 5px;
+  right: 5px;
   i {
-    cursor: pointer;
+    font-size: 25px;
   }
 }
-
-.selected-div {
+.image-item {
   position: relative;
-}
-
-.selected {
-  // background: url("./selected.png") no-repeat;
-  background-size: cover;
-  width: 100px;
-  height: 100px;
-  position: absolute;
-  top: 0;
-  display: flex;
-  justify-content: center;
-  align-items: center;
 }
 </style>
