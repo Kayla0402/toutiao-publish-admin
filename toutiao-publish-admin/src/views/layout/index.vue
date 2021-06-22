@@ -41,6 +41,8 @@
 <script>
 import AppAside from "./components/aside.vue";
 import { getUserProfile } from "@/api/user";
+import globalBus from "@/utils/globalBus";
+
 export default {
   name: "LayoutIndex",
   components: {
@@ -81,6 +83,18 @@ export default {
   created() {
     // 组件初始化好，请求获取用户资料
     this.loadUserProfile();
+
+    // 只有当事件发布以后，才会调用该事件总线
+    globalBus.$on("update-user", (data) => {
+      /**
+       * 不能直接赋值给this.user = data；
+       * 会导致当前的this.user的指向发生改变，
+       * 造成修改个人基本信息时顶部用户名也会跟着改变，
+       * 引用类型赋值是指针的赋值  
+       */
+      this.user.name = data.name;
+      this.user.photo = data.photo;
+    });
   },
 };
 </script>

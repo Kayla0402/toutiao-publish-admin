@@ -27,3 +27,21 @@ export const getUserProfile = () => {
     // }
   })
 }
+
+// 修改头像 ,data是FormData（）对象，这样会自动设置content-type格式
+export const updateUserPhoto = data => {
+  return request({
+    method: 'PATCH',
+    url: '/mp/v1_0/user/photo',
+    data
+  })
+}
+
+// 修改头像基本资料
+export const updateUserProfile = data => {
+  return request({
+    method: 'PATCH',
+    url: '/mp/v1_0/user/profile',
+    data
+  })
+}
