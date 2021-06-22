@@ -46,6 +46,11 @@ const routes = [
         path: '/settings',
         name: 'Setting',
         component: () => import(/* webpackChunkName: "home" */ '@/views/setting'),
+      },
+      {
+        path: '/fans',
+        name: 'Fans',
+        component: () => import(/* webpackChunkName: "home" */ '@/views/fans'),
       }
     ]
   }

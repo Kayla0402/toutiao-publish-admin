@@ -91,6 +91,7 @@ export default {
        * 会导致当前的this.user的指向发生改变，
        * 造成修改个人基本信息时顶部用户名也会跟着改变，
        * 引用类型赋值是指针的赋值  
+       * 对象之间赋值的是引用，会导致值之间的相互影响。
        */
       this.user.name = data.name;
       this.user.photo = data.photo;
