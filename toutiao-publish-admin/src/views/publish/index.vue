@@ -38,6 +38,37 @@
             <el-radio :label="0">无图</el-radio>
             <el-radio :label="-1">自动</el-radio>
           </el-radio-group>
+          <!-- 需要把子组件上传文件的图片地址放在article.cover.images中 -->
+          <!-- 上传封面组件 -->
+          <!-- 
+            事件处理函数自定义传参以后还要得到原来事件本身的参数，
+          则手动指定$event，它代表事件本身的参数 ，
+          onUpdateCover(index)，想要接受当前遍历的索引，
+          并且达到该事件本身传递的url地址
+          -->
+          <!-- 
+            当给子组件传递的数据既要使用又要修改，这个时候用
+            v-model简化数据的绑定，自定义组件的双绑
+            v-model="article.cover.images[index]"相当于下两句简写
+            给子组件传递了一个名叫value的数据，默认传递的值为value
+            默认的事件名为input
+            :value="article.cover.images[index]"
+            默认监听input事件，当事件input发生改变当前值为事件参数
+            @input="article.cover.images[index] = 事件参数 "
+            v-model只是简写了而已，本质还是在父子组件间的通讯
+           -->
+          <template v-if="article.cover.type > 0">
+
+            <upload-cover :key="cover" 
+              v-for="(cover, index) in article.cover.type"
+              v-model="article.cover.images[index]"
+             />
+
+            <!-- <upload-cover :key="cover" 
+            :cover-image="article.cover.images[index]"
+            v-for="(cover, index) in article.cover.type"
+            @update-cover="onUpdateCover(index, $event)"/> -->
+          </template>
         </el-form-item>
         <el-form-item label="频道" prop="channel_id">
           <el-select v-model="article.channel_id" placeholder="请选择活动区域">
@@ -62,6 +93,7 @@
 <script>
 // import element-tiptap 样式
 import "element-tiptap/lib/index.css";
+import UploadCover from "./components/upload-cover.vue"
 import {
   ElementTiptap,
   Doc,
@@ -89,6 +121,7 @@ export default {
   name: "Publish",
   components: {
     "el-tiptap": ElementTiptap,
+    UploadCover,
   },
   data() {
     return {
@@ -96,7 +129,7 @@ export default {
         title: "",
         content: "",
         cover: {
-          type: 0,
+          type: 3,
           images: [],
         },
         channel_id: null,
@@ -153,24 +186,20 @@ export default {
   methods: {
     onPublish(draft) {
       this.$refs.publishForm.validate(valid => {
-        console.log(444);
-        console.log(valid);
           if (!valid) return;
-          console.log(555);
           // 如果是修改文章，则执行修改操作，否则执行添加文章
           if (this.$route.query.id) {
-            console.log(666);
             updateArticle(this.$route.query.id, this.article, draft).then(
               (res) => {
                 if (draft) {
                   this.$message.success("存入草稿成功");
                 } else {
                   this.$message.success("修改成功");
+                  this.$router.push("/article");
                 }
               }
             );
           } else {
-            console.log(777);
             addArticle(this.article, draft).then((res) => {
               if (draft) {
                 this.$message.success("存入草稿成功");
@@ -193,6 +222,9 @@ export default {
         this.article = res.data.data;
       });
     },
+    // onUpdateCover(index, url) {
+    //   this.article.cover.images[index] = url
+    // }
   },
   created() {
     this.loaderChannels();
