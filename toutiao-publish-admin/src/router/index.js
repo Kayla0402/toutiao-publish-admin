@@ -78,6 +78,9 @@ router.beforeEach((to, from, next) => {
 
   // 校验非登录页面的登录状态
   if (to.path !== '/login') {
+    /**
+     * 可以伪造token值，直接localstorage输入user {} ，
+     */
     if (user) {
       // 已登录，允许通过
       next()
@@ -91,5 +94,6 @@ router.beforeEach((to, from, next) => {
   }
 })
 
-
+// 我们在组件中使用的this.$router其实就是这个模块中的router
+// 非组件中使用router路由对象，必须加载router对象，import
 export default router

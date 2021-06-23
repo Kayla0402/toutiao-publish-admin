@@ -1,6 +1,7 @@
 // 基于axios封装的请求模块
 import axios from 'axios';
 import JSONbig from 'json-bigint'
+import router from 'vue-router'
 
 // const str = '{ "id": 12345678901234567890 }'
 // // JSONbig.stringify()
@@ -61,17 +62,31 @@ request.interceptors.request.use(
     }
   )
   
-// use(两个参数)
-// request.interceptors.response.use(res => {
-//   // 请求成功对响应数据做处理
-//   // 该返回的数据则是axios.then(res)中接收的数据
-//   return Promise.resolve(res)
-// }, err => {
-//   // 在请求错误时要做的事儿
-//  console.log(err);
-//   // 该返回的数据则是axios.catch(err)中接收的数据
-//   return Promise.reject(err)
-// })
+// 响应拦截器  use(两个参数)  
+request.interceptors.response.use(res => {
+  // 请求成功对响应数据做处理 所有响应码为2xxx都进入这里
+  // 该返回的数据则是axios.then(res)中接收的数据
+  // res为响应数据，一定要把响应结果return，否则真正发请求的地方拿不到数据
+  return Promise.resolve(res)
+}, err => {
+  // 在请求错误时要做的事儿 不是2xx的响应码都会进入这里
+ console.log(err);
+  // 该返回的数据则是axios.catch(err)中接收的数据
+  if(err&&err.response&&err.response.status === 401) {
+    // 跳转至登录页面，只有组件中有router对象，
+    // 不可以通过this.$router进行页面的调整
+    // 重新在该页面加载路由组件，import
+    window.localStorage.removeItem('user')
+    router.push('/login')
+  } else if(err.response.status === 400) {
+    // 客户端参数报错
+  } else if(err.response.status === 403) {
+    // 没有操作权限
+  } else if(err.response.status >= 500) {
+    // 服务器报错
+  }
+  return Promise.reject(err)
+})
 
 // 到处请求方法
 export default request;
