@@ -2,6 +2,8 @@
 import axios from 'axios';
 import JSONbig from 'json-bigint'
 import router from 'vue-router'
+// 非组件模块加载使用message模块
+import { Message } from 'element-ui'
 
 // const str = '{ "id": 12345678901234567890 }'
 // // JSONbig.stringify()
@@ -80,10 +82,14 @@ request.interceptors.response.use(res => {
     router.push('/login')
   } else if(err.response.status === 400) {
     // 客户端参数报错
+    // this.$message只能在组件中使用，在这里可以单独引用
+    Message('客户端参数报错')
   } else if(err.response.status === 403) {
     // 没有操作权限
+    Message('没有操作权限')
   } else if(err.response.status >= 500) {
     // 服务器报错
+    Message('服务器报错,稍后再试')
   }
   return Promise.reject(err)
 })
